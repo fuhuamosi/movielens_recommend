@@ -56,7 +56,6 @@ class ItemCF:
             self.test_set = test
             self.train_movies = Common.get_movies(self.train_set)
             self.train_users = Common.get_users(self.train_set)
-            print(len(self.train_movies))
             sim_mat = self.item_similarity()
             for m in self.train_movies:
                 sim_mat[m] = sorted(sim_mat[m].items(),
