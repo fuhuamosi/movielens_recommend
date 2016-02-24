@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="83d75fc6-e3ba-43bb-b629-ded1ab955221" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MovieLens/offline_system/analysis/item_cf.py" afterPath="$PROJECT_DIR$/MovieLens/offline_system/analysis/item_cf.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="MovieRecommend.iws" />
@@ -652,7 +651,13 @@
       <option name="project" value="LOCAL" />
       <updated>1456344620376</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Fix item_cf.py">
+      <created>1456345687669</created>
+      <option name="number" value="00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1456345687669</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -716,7 +721,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add item_cf algorithm and a decorator for calculating the running time of a function." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add item_cf algorithm and a decorator for calculating the running time of a function." />
+    <MESSAGE value="Fix item_cf.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix item_cf.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
