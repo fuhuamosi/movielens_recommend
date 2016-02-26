@@ -2,6 +2,7 @@
   <dictionary name="fuhuamosi">
     <words>
       <w>jaccard</w>
+      <w>movielens</w>
       <w>popularities</w>
       <w>spliter</w>
     </words>

@@ -1,2 +1,2 @@
 # movielens_recommend
-A single recommend system for MovieLens.
+A simple recommend system for MovieLens.
