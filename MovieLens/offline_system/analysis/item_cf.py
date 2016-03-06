@@ -34,13 +34,17 @@ class ItemCF:
         if self.dis_type == 'cos':
             um_dict = dict().fromkeys(self.train_movies, 0.0)
             sim_mat = Distance.cal_cos(sim_mat, um_dict, invert_dict)
-            return sim_mat
         elif self.dis_type == 'jaccard':
             um_dict = {}
             for u in self.train_movies:
                 um_dict[u] = set()
             sim_mat = Distance.cal_jaccard(sim_mat, um_dict, invert_dict)
-            return sim_mat
+        elif self.dis_type == 'cos_advance':
+            movie_amount = 10329
+            um_dict = dict().fromkeys(self.train_movies, 0.0)
+            sim_mat = Distance.cal_cos_advance(sim_mat, um_dict,
+                                               invert_dict, amount=movie_amount)
+        return sim_mat
 
     # 获得用户-电影倒排表
     def get_invert_dict(self):
@@ -97,5 +101,5 @@ class ItemCF:
 
 
 if __name__ == '__main__':
-    item_cf = ItemCF(k=20, n=20, dis_type='cos')
+    item_cf = ItemCF(k=40, n=20, dis_type='cos_advance')
     item_cf.cal_evaluation()

@@ -33,13 +33,17 @@ class UserCf:
         if self.dis_type == 'cos':
             um_dict = dict().fromkeys(self.train_users, 0.0)
             sim_mat = Distance.cal_cos(sim_mat, um_dict, invert_dict)
-            return sim_mat
         elif self.dis_type == 'jaccard':
             um_dict = {}
             for u in self.train_users:
                 um_dict[u] = set()
             sim_mat = Distance.cal_jaccard(sim_mat, um_dict, invert_dict)
-            return sim_mat
+        elif self.dis_type == 'cos_advance':
+            user_amount = 668
+            um_dict = dict().fromkeys(self.train_users, 0.0)
+            sim_mat = Distance.cal_cos_advance(sim_mat, um_dict,
+                                               invert_dict, amount=user_amount)
+        return sim_mat
 
     # 获得电影-用户倒排表
     def get_invert_dict(self):
