@@ -40,7 +40,7 @@ class ItemCF:
                 um_dict[u] = set()
             sim_mat = Distance.cal_jaccard(sim_mat, um_dict, invert_dict)
         elif self.dis_type == 'cos_advance':
-            movie_amount = 10329
+            movie_amount = len(Common.get_all_movies())
             um_dict = dict().fromkeys(self.train_movies, 0.0)
             sim_mat = Distance.cal_cos_advance(sim_mat, um_dict,
                                                invert_dict, amount=movie_amount)

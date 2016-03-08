@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from MovieLens.offline_system.analysis.common import Common
 import math
+
 __author__ = 'fuhuamosi'
 
 
@@ -11,8 +12,8 @@ class Evaluation:
         self.train_set = train
         self.test_set = test
         self.recommend_list = recommend_list
-        self.user_count = 668
-        self.movie_count = 10329
+        self.user_count = len(Common.get_all_users())
+        self.movie_count = len(Common.get_all_movies())
 
     def cal_precision_and_recall(self):
         hit = 0

@@ -39,7 +39,7 @@ class UserCf:
                 um_dict[u] = set()
             sim_mat = Distance.cal_jaccard(sim_mat, um_dict, invert_dict)
         elif self.dis_type == 'cos_advance':
-            user_amount = 668
+            user_amount = len(Common.get_all_users())
             um_dict = dict().fromkeys(self.train_users, 0.0)
             sim_mat = Distance.cal_cos_advance(sim_mat, um_dict,
                                                invert_dict, amount=user_amount)
@@ -99,5 +99,5 @@ class UserCf:
 
 
 if __name__ == '__main__':
-    user_cf = UserCf(k=30, n=20, dis_type='cos')
+    user_cf = UserCf(k=30, n=20, dis_type='cos_advance')
     user_cf.cal_evaluation()

@@ -1,6 +1,8 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import time
+from MovieLens.models import Movie, Rating
+from collections import Counter
 
 __author__ = 'fuhuamosi'
 
@@ -58,3 +60,45 @@ class Common:
             return back
 
         return wrapper
+
+    @staticmethod
+    def get_all_users():
+        ratings = list(Rating.objects.all())
+        users = set()
+        for rating in ratings:
+            users.add(rating.user_id)
+        return sorted(users, key=lambda x: x)
+
+    @staticmethod
+    def get_all_movies():
+        ratings = list(Rating.objects.all())
+        movies = set()
+        for rating in ratings:
+            movies.add(rating.movie_id)
+        return sorted(movies, key=lambda x: x)
+
+    @staticmethod
+    def get_all_movies():
+        ratings = list(Rating.objects.all())
+        movies = set()
+        for rating in ratings:
+            movies.add(rating.movie_id)
+        return sorted(movies, key=lambda x: x)
+
+    @staticmethod
+    def get_all_genres_cnt():
+        movies = list(Movie.objects.all())
+        movie_genres = list()
+        for movie in movies:
+            g = movie.genres.split('|')
+            movie_genres.extend(g)
+        movie_genres = dict(Counter(movie_genres))
+        movie_genres = sorted(movie_genres.items(), key=lambda x: x[1], reverse=True)
+        return movie_genres
+
+
+if __name__ == '__main__':
+    genres_list = Common().get_all_genres_cnt()
+    for g in genres_list:
+        print(g)
+    print(len(genres_list))

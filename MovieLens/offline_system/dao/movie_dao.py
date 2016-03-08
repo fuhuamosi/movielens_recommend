@@ -10,3 +10,8 @@ def add_movie(movie_id: int, title, genres):
     movie.title = title
     movie.genres = genres
     movie.save()
+
+
+def get_genres_by_id(movie_id):
+    movie = Movie.objects.get(movie_id=movie_id)
+    return movie.genres.split('|')
