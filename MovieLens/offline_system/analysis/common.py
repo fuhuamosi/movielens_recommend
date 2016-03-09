@@ -37,6 +37,7 @@ class Common:
             user_movie_dict.setdefault(r.user_id, set()).add(r.movie_id)
         return user_movie_dict
 
+    # 统计电影被评分的次数
     @staticmethod
     def get_movie_times_dict(ratings: list):
         movie_times_dict = {}
