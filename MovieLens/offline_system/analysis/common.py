@@ -46,6 +46,15 @@ class Common:
             movie_times_dict[r.movie_id] += 1
         return movie_times_dict
 
+    # 统计电影得过的总分
+    @staticmethod
+    def get_movie_ratings_dict(ratings: list):
+        movie_ratings = {}
+        for r in ratings:
+            movie_ratings.setdefault(r.movie_id, 0.0)
+            movie_ratings[r.movie_id] += r.movie_rating
+        return movie_ratings
+
     # 计算程序运行时间
     @staticmethod
     def exe_time(func):
