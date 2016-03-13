@@ -98,25 +98,8 @@ class Common:
         movie_genres = sorted(movie_genres.items(), key=lambda x: x[1], reverse=True)
         return movie_genres
 
-    @staticmethod
-    def get_all_genres_ratio(genres_cnt: list):
-        cnt = [gc[1] for gc in genres_cnt]
-        cnt_sum = reduce(Common.add, cnt)
-        genres_ratio = {}
-        for genre, cnt in genres_cnt:
-            genres_ratio[genre] = cnt / float(cnt_sum)
-        genres_ratio = sorted(genres_ratio.items(), key=lambda x: x[1])
-        return genres_ratio
-
-    @staticmethod
-    def add(x, y):
-        return x + y
-
 
 if __name__ == '__main__':
     genres_list = Common().get_all_genres_cnt()
     for g in genres_list:
         print(g)
-    genres_ra = Common.get_all_genres_ratio(genres_list)
-    for k, v in genres_ra:
-        print(k, v)
