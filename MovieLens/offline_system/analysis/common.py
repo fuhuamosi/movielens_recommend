@@ -3,6 +3,7 @@
 import time
 from MovieLens.models import Movie, Rating
 from collections import Counter
+from functools import reduce
 
 __author__ = 'fuhuamosi'
 
@@ -45,15 +46,6 @@ class Common:
             movie_times_dict.setdefault(r.movie_id, 0)
             movie_times_dict[r.movie_id] += 1
         return movie_times_dict
-
-    # 统计电影得过的总分
-    @staticmethod
-    def get_movie_ratings_dict(ratings: list):
-        movie_ratings = {}
-        for r in ratings:
-            movie_ratings.setdefault(r.movie_id, 0.0)
-            movie_ratings[r.movie_id] += r.movie_rating
-        return movie_ratings
 
     # 计算程序运行时间
     @staticmethod
@@ -106,9 +98,25 @@ class Common:
         movie_genres = sorted(movie_genres.items(), key=lambda x: x[1], reverse=True)
         return movie_genres
 
+    @staticmethod
+    def get_all_genres_ratio(genres_cnt: list):
+        cnt = [gc[1] for gc in genres_cnt]
+        cnt_sum = reduce(Common.add, cnt)
+        genres_ratio = {}
+        for genre, cnt in genres_cnt:
+            genres_ratio[genre] = cnt / float(cnt_sum)
+        genres_ratio = sorted(genres_ratio.items(), key=lambda x: x[1])
+        return genres_ratio
+
+    @staticmethod
+    def add(x, y):
+        return x + y
+
 
 if __name__ == '__main__':
     genres_list = Common().get_all_genres_cnt()
     for g in genres_list:
         print(g)
-    print(len(genres_list))
+    genres_ra = Common.get_all_genres_ratio(genres_list)
+    for k, v in genres_ra:
+        print(k, v)

@@ -14,10 +14,12 @@ __author__ = 'fuhuamosi'
 
 # 基于电影风格的协同过滤算法
 class GenreCF:
-    def __init__(self, n, x=5, k=5):
+    def __init__(self, n, x=5, k=5, alpha=1.0, beta=0.0):
         self.n = n
         self.x = x
         self.k = k
+        self.alpha = alpha
+        self.beta = beta
         self.all_users = Common.get_all_users()
         self.all_movies = Common.get_all_movies()
         self.all_genres = [g[0] for g in Common.get_all_genres_cnt()]
@@ -27,7 +29,7 @@ class GenreCF:
         self.um = None
         self.mg = None
         self.ug = None
-        self.movie_ratings_genres = {}
+        self.movie_times_genres = {}
 
     def init_matrix(self):
         user_cnt = len(self.all_users)
@@ -42,16 +44,14 @@ class GenreCF:
             self.um[user_sub, movie_sub] = rating.movie_rating
             for g in movie_genres:
                 genre_sub = self.all_genres.index(g)
-                # self.mg[movie_sub, genre_sub] = 1.0 / len(movie_genres)
-                self.mg[movie_sub, genre_sub] = 1.0
+                self.mg[movie_sub, genre_sub] = 1.0 / len(movie_genres)
+                # self.mg[movie_sub, genre_sub] = 1.0
 
-    def set_movie_ratings_genres(self):
-        movie_ratings_dict = Common.get_movie_ratings_dict(self.train_set)
-        for m, t in movie_ratings_dict.items():
-            movie_ratings_dict[m] = (t, get_genres_by_id(m))
-        self.movie_ratings_genres = (sorted(movie_ratings_dict.items(),
-                                            key=lambda x: x[1][0],
-                                            reverse=True))
+    def set_movie_times_genres(self):
+        self.movie_times_genres = {}
+        movie_times_dict = Common.get_movie_times_dict(self.train_set)
+        for m, t in movie_times_dict.items():
+            self.movie_times_genres[m] = (t, get_genres_by_id(m))
 
     @staticmethod
     def cal_cos(set1, set2):
@@ -63,7 +63,7 @@ class GenreCF:
             self.train_set = train
             self.test_set = test
             self.movie_score = {}
-            self.set_movie_ratings_genres()
+            self.set_movie_times_genres()
             self.init_matrix()
             self.ug = np.dot(self.um, self.mg)
             favor_genres = self.ug.argsort()[:, -1:-(self.k + 1):-1]
@@ -72,18 +72,20 @@ class GenreCF:
                 old_movies = user_movie_dict[user]
                 user_favor_genres = set()
                 for fg in favor_genres[user - 1]:
-                    user_favor_genres.add(self.all_genres[fg])
-                for movie, ratings_and_genres in self.movie_ratings_genres:
+                    genre = self.all_genres[fg]
+                    user_favor_genres.add(genre)
+                for movie, times_and_genres in self.movie_times_genres.items():
                     if movie not in old_movies:
-                        ratings = ratings_and_genres[0]
-                        genres = ratings_and_genres[1]
+                        times = times_and_genres[0]
+                        genres = times_and_genres[1]
                         genre_sim = self.cal_cos(user_favor_genres, genres)
                         self.movie_score.setdefault(user, {})
-                        self.movie_score[user][movie] = ratings * genre_sim
+                        self.movie_score[user][movie] = self.alpha * times
+                        self.movie_score[user][movie] += self.beta * genre_sim
                 self.movie_score[user] = sorted(self.movie_score[user].items(),
                                                 key=lambda r: r[1], reverse=True)
                 self.movie_score[user] = self.movie_score[user][:self.n]
-                if user < 10:
+                if user < 5:
                     print(user, self.movie_score[user][:5])
             yield self.movie_score
 
@@ -110,5 +112,5 @@ class GenreCF:
 
 
 if __name__ == '__main__':
-    genre_cf = GenreCF(n=20, k=5)
+    genre_cf = GenreCF(n=20, k=5, alpha=0.01, beta=1.0)
     genre_cf.cal_evaluation()
