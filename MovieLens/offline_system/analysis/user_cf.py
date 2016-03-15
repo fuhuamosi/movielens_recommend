@@ -7,13 +7,15 @@ from MovieLens.offline_system.data_preprocess.data_spliter import DataSpliter
 from MovieLens.offline_system.analysis.common import Common
 from MovieLens.offline_system.analysis.evaluation import Evaluation
 from MovieLens.offline_system.analysis.distance import Distance
+from MovieLens.offline_system.dao.movie_dao import get_genres_by_id
+from MovieLens.offline_system.analysis.genre_cf import GenreCF
 
 __author__ = 'fuhuamosi'
 
 
 # 基于用户的协同过滤算法
 class UserCf:
-    def __init__(self, k, n, x=5, dis_type='cos'):
+    def __init__(self, k, n, x=5, dis_type='cos', genre_cf=None):
         self.k = k
         self.n = n
         self.x = x
@@ -22,6 +24,19 @@ class UserCf:
         self.train_users = set()
         self.movie_score = {}
         self.dis_type = dis_type
+        self.genre_cf = genre_cf
+        self.movie_genres = {}
+        if self.genre_cf is not None:
+            for movie in self.genre_cf.all_movies:
+                self.movie_genres[movie] = get_genres_by_id(movie)
+
+    def genre_score(self, user_sim, rating, user, movie, favor_genres):
+        user_favor_genres = set()
+        for fg in favor_genres[user - 1]:
+            genre = self.genre_cf.all_genres[fg]
+            user_favor_genres.add(genre)
+        genre_sim = self.genre_cf.cal_cos(user_favor_genres, self.movie_genres[movie])
+        return user_sim * rating + genre_sim
 
     def user_similarity(self):
         invert_dict = self.get_invert_dict()
@@ -58,6 +73,12 @@ class UserCf:
             self.train_set = train
             self.test_set = test
             self.train_users = Common.get_users(self.train_set)
+
+            user_favor_genres = None
+            if self.genre_cf is not None:
+                self.genre_cf.set_train(self.train_set)
+                user_favor_genres = self.genre_cf.get_user_favor_genres()
+
             sim_mat = self.user_similarity()
             for u in self.train_users:
                 sim_mat[u] = sorted(sim_mat[u].items(),
@@ -73,7 +94,14 @@ class UserCf:
                         if movie not in rating_dict[user].keys():
                             movie_rank = self.movie_score.setdefault(user, {})
                             movie_rank.setdefault(movie, 0.0)
-                            movie_rank[movie] += similarity * rating_dict[sim_user][movie]
+                            if self.genre_cf is None:
+                                movie_rank[movie] += similarity * rating_dict[sim_user][movie]
+                            else:
+                                movie_rank[movie] += self.genre_score(similarity,
+                                                                      rating_dict[sim_user][movie],
+                                                                      user,
+                                                                      movie,
+                                                                      user_favor_genres)
                 self.movie_score[user] = sorted(self.movie_score[user].items(),
                                                 key=lambda r: r[1], reverse=True)
                 self.movie_score[user] = self.movie_score[user][:self.n]
@@ -88,16 +116,19 @@ class UserCf:
         for recommendation_list in self.recommend():
             eva = Evaluation(self.train_set, self.test_set, recommendation_list)
             precision, recall = eva.cal_precision_and_recall()
+            coverage = eva.cal_coverage()
+            popularity = eva.cal_popularity()
             precisions = np.append(precisions, precision)
             recalls = np.append(recalls, recall)
-            coverages = np.append(coverages, eva.cal_coverage())
-            popularities = np.append(popularities, eva.cal_popularity())
-        print('Precisions:', precisions.mean(), precisions)
-        print('Recalls:', recalls.mean(), recalls)
-        print('Coverages:', coverages.mean(), coverages)
-        print('Popularities:', popularities.mean(), popularities)
+            coverages = np.append(coverages, coverage)
+            popularities = np.append(popularities, popularity)
+            print(precision, recall, coverage, popularity)
+        print('Precision:', precisions.mean())
+        print('Recall:', recalls.mean())
+        print('Coverage:', coverages.mean())
+        print('Popularity:', popularities.mean())
 
 
 if __name__ == '__main__':
-    user_cf = UserCf(k=30, n=20, dis_type='cos_advance')
+    user_cf = UserCf(k=30, n=20, dis_type='cos', genre_cf=GenreCF())
     user_cf.cal_evaluation()

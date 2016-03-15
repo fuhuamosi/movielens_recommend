@@ -47,7 +47,7 @@ class Distance:
                 for v2 in vs:
                     if v1 == v2:
                         continue
-                    sim_mat[v1][v2] += 1 - len(vs) / float(amount)
+                    sim_mat[v1][v2] += 1 / math.log(1 + len(vs))
         for x in sim_mat.keys():
             for y in sim_mat[x].keys():
                 if x == y:

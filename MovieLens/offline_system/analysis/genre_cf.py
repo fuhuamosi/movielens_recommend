@@ -14,10 +14,10 @@ __author__ = 'fuhuamosi'
 
 # 基于电影风格的协同过滤算法
 class GenreCF:
-    def __init__(self, n, x=5, k=5, alpha=1.0, beta=0.0):
+    def __init__(self, n=20, x=5, z=5, alpha=0.01, beta=1.0):
         self.n = n
         self.x = x
-        self.k = k
+        self.z = z
         self.alpha = alpha
         self.beta = beta
         self.all_users = Common.get_all_users()
@@ -31,6 +31,7 @@ class GenreCF:
         self.ug = None
         self.movie_times_genres = {}
 
+    @Common.exe_time
     def init_matrix(self):
         user_cnt = len(self.all_users)
         movie_cnt = len(self.all_movies)
@@ -63,10 +64,7 @@ class GenreCF:
             self.train_set = train
             self.test_set = test
             self.movie_score = {}
-            self.set_movie_times_genres()
-            self.init_matrix()
-            self.ug = np.dot(self.um, self.mg)
-            favor_genres = self.ug.argsort()[:, -1:-(self.k + 1):-1]
+            favor_genres = self.get_user_favor_genres()
             user_movie_dict = Common.get_user_movie_dict(self.train_set)
             for user in self.all_users:
                 old_movies = user_movie_dict[user]
@@ -110,7 +108,17 @@ class GenreCF:
         print('Coverage:', coverages.mean())
         print('Popularity:', popularities.mean())
 
+    def get_user_favor_genres(self):
+        self.set_movie_times_genres()
+        self.init_matrix()
+        self.ug = np.dot(self.um, self.mg)
+        favor_genres = self.ug.argsort()[:, -1:-(self.z + 1):-1]
+        return favor_genres
+
+    def set_train(self, train):
+        self.train_set = train
+
 
 if __name__ == '__main__':
-    genre_cf = GenreCF(n=20, k=5, alpha=0.01, beta=1.0)
+    genre_cf = GenreCF(n=20, z=5, alpha=0.015, beta=1.0)
     genre_cf.cal_evaluation()
