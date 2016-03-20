@@ -3,8 +3,8 @@
 import math
 import numpy as np
 from MovieLens.offline_system.data_preprocess.data_spliter import DataSpliter
-from MovieLens.offline_system.analysis.common import Common
-from MovieLens.offline_system.analysis.evaluation import Evaluation
+from MovieLens.offline_system.common.common import Common
+from MovieLens.offline_system.evaluation.evaluation import Evaluation
 from MovieLens.offline_system.dao.movie_dao import get_genres_by_id
 from MovieLens.models import Rating
 import random
@@ -25,7 +25,7 @@ class GenreCF:
         self.all_genres = [g[0] for g in Common.get_all_genres_cnt()]
         self.train_set = []
         self.test_set = []
-        self.movie_score = {}
+        self.movie_favor = {}
         self.um = None
         self.mg = None
         self.ug = None
@@ -63,7 +63,7 @@ class GenreCF:
         for train, test in DataSpliter.split_ratings(self.x):
             self.train_set = train
             self.test_set = test
-            self.movie_score = {}
+            self.movie_favor = {}
             favor_genres = self.get_user_favor_genres()
             user_movie_dict = Common.get_user_movie_dict(self.train_set)
             for user in self.all_users:
@@ -77,15 +77,15 @@ class GenreCF:
                         times = times_and_genres[0]
                         genres = times_and_genres[1]
                         genre_sim = self.cal_cos(user_favor_genres, genres)
-                        self.movie_score.setdefault(user, {})
-                        self.movie_score[user][movie] = self.alpha * times
-                        self.movie_score[user][movie] += self.beta * genre_sim
-                self.movie_score[user] = sorted(self.movie_score[user].items(),
+                        self.movie_favor.setdefault(user, {})
+                        self.movie_favor[user][movie] = self.alpha * times
+                        self.movie_favor[user][movie] += self.beta * genre_sim
+                self.movie_favor[user] = sorted(self.movie_favor[user].items(),
                                                 key=lambda r: r[1], reverse=True)
-                self.movie_score[user] = self.movie_score[user][:self.n]
+                self.movie_favor[user] = self.movie_favor[user][:self.n]
                 if user < 5:
-                    print(user, self.movie_score[user][:5])
-            yield self.movie_score
+                    print(user, self.movie_favor[user][:5])
+            yield self.movie_favor
 
     @Common.exe_time
     def cal_evaluation(self):

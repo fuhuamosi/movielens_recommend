@@ -4,8 +4,8 @@
 import math
 import numpy as np
 from MovieLens.offline_system.data_preprocess.data_spliter import DataSpliter
-from MovieLens.offline_system.analysis.common import Common
-from MovieLens.offline_system.analysis.evaluation import Evaluation
+from MovieLens.offline_system.common.common import Common
+from MovieLens.offline_system.evaluation.evaluation import Evaluation
 from MovieLens.offline_system.analysis.distance import Distance
 
 __author__ = 'fuhuamosi'
@@ -21,7 +21,7 @@ class ItemCF:
         self.test_set = []
         self.train_users = set()
         self.train_movies = set()
-        self.movie_score = {}
+        self.movie_favor = {}
         self.dis_type = dis_type
 
     def item_similarity(self):
@@ -66,20 +66,20 @@ class ItemCF:
                                     key=lambda a: a[1], reverse=True)
                 sim_mat[m] = sim_mat[m][:self.k]
             rating_dict = Common.get_rating_dict(self.train_set)
-            self.movie_score = {}
+            self.movie_favor = {}
             for user in self.train_users:
                 for movie in rating_dict[user].keys():
                     for v in sim_mat[movie]:
                         new_movie = v[0]
                         similarity = v[1]
                         if new_movie not in rating_dict[user].keys():
-                            movie_rank = self.movie_score.setdefault(user, {})
+                            movie_rank = self.movie_favor.setdefault(user, {})
                             movie_rank.setdefault(new_movie, 0.0)
                             movie_rank[new_movie] += similarity * rating_dict[user][movie]
-                self.movie_score[user] = sorted(self.movie_score[user].items(),
+                self.movie_favor[user] = sorted(self.movie_favor[user].items(),
                                                 key=lambda r: r[1], reverse=True)
-                self.movie_score[user] = self.movie_score[user][:self.n]
-            yield self.movie_score
+                self.movie_favor[user] = self.movie_favor[user][:self.n]
+            yield self.movie_favor
 
     @Common.exe_time
     def cal_evaluation(self):

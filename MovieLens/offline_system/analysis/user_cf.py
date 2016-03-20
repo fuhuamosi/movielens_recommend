@@ -4,8 +4,8 @@
 import math
 import numpy as np
 from MovieLens.offline_system.data_preprocess.data_spliter import DataSpliter
-from MovieLens.offline_system.analysis.common import Common
-from MovieLens.offline_system.analysis.evaluation import Evaluation
+from MovieLens.offline_system.common.common import Common
+from MovieLens.offline_system.evaluation.evaluation import Evaluation
 from MovieLens.offline_system.analysis.distance import Distance
 from MovieLens.offline_system.dao.movie_dao import get_genres_by_id
 from MovieLens.offline_system.analysis.genre_cf import GenreCF
@@ -22,7 +22,7 @@ class UserCf:
         self.train_set = []
         self.test_set = []
         self.train_users = set()
-        self.movie_score = {}
+        self.movie_favor = {}
         self.dis_type = dis_type
         self.genre_cf = genre_cf
         self.movie_genres = {}
@@ -85,14 +85,14 @@ class UserCf:
                                     key=lambda a: a[1], reverse=True)
                 sim_mat[u] = sim_mat[u][:self.k]
             rating_dict = Common.get_rating_dict(self.train_set)
-            self.movie_score = {}
+            self.movie_favor = {}
             for user in self.train_users:
                 for v in sim_mat[user]:
                     sim_user = v[0]
                     similarity = v[1]
                     for movie in rating_dict[sim_user].keys():
                         if movie not in rating_dict[user].keys():
-                            movie_rank = self.movie_score.setdefault(user, {})
+                            movie_rank = self.movie_favor.setdefault(user, {})
                             movie_rank.setdefault(movie, 0.0)
                             if self.genre_cf is None:
                                 movie_rank[movie] += similarity * rating_dict[sim_user][movie]
@@ -102,10 +102,10 @@ class UserCf:
                                                                       user,
                                                                       movie,
                                                                       user_favor_genres)
-                self.movie_score[user] = sorted(self.movie_score[user].items(),
+                self.movie_favor[user] = sorted(self.movie_favor[user].items(),
                                                 key=lambda r: r[1], reverse=True)
-                self.movie_score[user] = self.movie_score[user][:self.n]
-            yield self.movie_score
+                self.movie_favor[user] = self.movie_favor[user][:self.n]
+            yield self.movie_favor
 
     @Common.exe_time
     def cal_evaluation(self):
@@ -122,7 +122,7 @@ class UserCf:
             recalls = np.append(recalls, recall)
             coverages = np.append(coverages, coverage)
             popularities = np.append(popularities, popularity)
-            print(precision, recall, coverage, popularity)
+            # print(precision, recall, coverage, popularity)
         print('Precision:', precisions.mean())
         print('Recall:', recalls.mean())
         print('Coverage:', coverages.mean())
@@ -130,5 +130,8 @@ class UserCf:
 
 
 if __name__ == '__main__':
-    user_cf = UserCf(k=30, n=20, dis_type='cos', genre_cf=GenreCF())
-    user_cf.cal_evaluation()
+    for i in [5]:
+        user_cf = UserCf(k=30, n=20, dis_type='cos', genre_cf=GenreCF(z=i))
+        # user_cf = UserCf(k=30, n=20, dis_type='cos', genre_cf=GenreCF())
+        print(i)
+        user_cf.cal_evaluation()

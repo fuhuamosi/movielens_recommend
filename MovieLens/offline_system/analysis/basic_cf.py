@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from MovieLens.offline_system.data_preprocess.data_spliter import DataSpliter
-from MovieLens.offline_system.analysis.common import Common
-from MovieLens.offline_system.analysis.evaluation import Evaluation
+from MovieLens.offline_system.common.common import Common
+from MovieLens.offline_system.evaluation.evaluation import Evaluation
 
 __author__ = 'fuhuamosi'
 

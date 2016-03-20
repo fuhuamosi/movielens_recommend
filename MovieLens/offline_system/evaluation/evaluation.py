@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from MovieLens.offline_system.analysis.common import Common
+from MovieLens.offline_system.common.common import Common
 import math
 
 __author__ = 'fuhuamosi'
