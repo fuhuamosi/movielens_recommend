@@ -83,8 +83,6 @@ class GenreCF:
                 self.movie_favor[user] = sorted(self.movie_favor[user].items(),
                                                 key=lambda r: r[1], reverse=True)
                 self.movie_favor[user] = self.movie_favor[user][:self.n]
-                if user < 5:
-                    print(user, self.movie_favor[user][:5])
             yield self.movie_favor
 
     @Common.exe_time
@@ -102,7 +100,6 @@ class GenreCF:
             recalls = np.append(recalls, recall)
             coverages = np.append(coverages, coverage)
             popularities = np.append(popularities, popularity)
-            print(precision, recall, coverage, popularity)
         print('Precision:', precisions.mean())
         print('Recall:', recalls.mean())
         print('Coverage:', coverages.mean())
@@ -120,5 +117,5 @@ class GenreCF:
 
 
 if __name__ == '__main__':
-    genre_cf = GenreCF(n=20, z=5, alpha=0.015, beta=1.0)
+    genre_cf = GenreCF(n=20, z=5, alpha=0, beta=1.0)
     genre_cf.cal_evaluation()
