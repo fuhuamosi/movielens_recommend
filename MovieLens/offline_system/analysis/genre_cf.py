@@ -38,6 +38,7 @@ class GenreCF:
         genre_cnt = len(self.all_genres)
         self.um = np.array([[0.0] * movie_cnt] * user_cnt)
         self.mg = np.array([[0.0] * genre_cnt] * movie_cnt)
+        idf_dict = self.cal_idf()
         for rating in self.train_set:
             user_sub = rating.user_id - 1
             movie_sub = self.all_movies.index(rating.movie_id)
@@ -45,8 +46,19 @@ class GenreCF:
             self.um[user_sub, movie_sub] = rating.movie_rating
             for g in movie_genres:
                 genre_sub = self.all_genres.index(g)
-                self.mg[movie_sub, genre_sub] = 1.0 / len(movie_genres)
+                self.mg[movie_sub, genre_sub] = 1.0 / len(movie_genres) * idf_dict[g]
                 # self.mg[movie_sub, genre_sub] = 1.0
+
+    def cal_idf(self):
+        idf_dict = dict()
+        for rating in self.train_set:
+            movie_genres = get_genres_by_id(rating.movie_id)
+            for g in movie_genres:
+                idf_dict.setdefault(g, 0.0)
+                idf_dict[g] += 1
+        for k in idf_dict:
+            idf_dict[k] = math.log(len(self.train_set) / idf_dict[k])
+        return idf_dict
 
     def set_movie_times_genres(self):
         self.movie_times_genres = {}

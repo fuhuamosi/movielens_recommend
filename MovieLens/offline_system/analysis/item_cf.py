@@ -101,5 +101,5 @@ class ItemCF:
 
 
 if __name__ == '__main__':
-    item_cf = ItemCF(k=40, n=20, dis_type='cos_advance')
+    item_cf = ItemCF(k=40, n=20, dis_type='cos')
     item_cf.cal_evaluation()

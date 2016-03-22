@@ -122,7 +122,7 @@ class UserCf:
             recalls = np.append(recalls, recall)
             coverages = np.append(coverages, coverage)
             popularities = np.append(popularities, popularity)
-            # print(precision, recall, coverage, popularity)
+            print(precision, recall, coverage, popularity)
         print('Precision:', precisions.mean())
         print('Recall:', recalls.mean())
         print('Coverage:', coverages.mean())
